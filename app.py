@@ -3,8 +3,8 @@ from flask_restx import Api, Resource
 
 
 from config import app, db
-from models import Movie
-from shemas import MovieSchema
+from models import Movie, Director, Genre
+from shemas import MovieSchema, DirectorSchema, GenreSchema
 
 api = Api(app)
 
@@ -40,17 +40,17 @@ class MoviesViews(Resource):
             return "Load False", 500
 
 
-@movie_ns.route("/<int:id>/")
+@movie_ns.route("/<int:id>")
 class MoviesViews(Resource):
     def get(self, id):
-        a = MovieSchema().dump(Movie.query.filter(Movie.id == id))
+        a = MovieSchema().dump(Movie.query.filter(Movie.id == id).first())
         return a, 200
 
     def put(self, id):
         data = request.json
         try:
             result = Movie.query.filter(Movie.id == id).one()
-            result.title = data.get('title')
+            result = data.get()
             db.session.add(result)
             db.session.commit()
             return "UpLoad True"
@@ -67,6 +67,119 @@ class MoviesViews(Resource):
         except Exception:
             db.session.rollback()
             return "Delete False", 500
+
+@director_ns.route("/")
+class DirectorViews(Resource):
+    def get(self):
+        director_id = request.args.get('id')
+        query = Director.query
+        if director_id:
+            query = query.filter(Director.id == director_id)
+
+        return DirectorSchema(many=True).dump(query.all()), 200
+
+    def post(self):
+        data = request.json
+        try:
+            db.session.add(
+                Director(**data)
+            )
+            db.session.commit()
+            return "Load Try"
+        except Exception as e:
+            print(e)
+            db.session.rollback() #rollback - это отмена записи, лучше делать обвязку через тру
+            return "Load False", 500
+
+
+@director_ns.route("/<int:id>")
+class DirectorViews(Resource):
+    def get(self, id):
+        a = DirectorSchema().dump(Director.query.filter(Director.id == id).first())
+        return a, 200
+
+    def put(self, id):
+        data = request.json
+        try:
+            result = Director.query.filter(Director.id == id).one()
+            result = data.get()
+            db.session.add(result)
+            db.session.commit()
+            return "UpLoad True"
+        except Exception:
+            db.session.rollback()
+            return "UpLoad False", 500
+
+    def delete(self, id):
+        try:
+            result = Director.query.filter(Director.id == id).one()
+            db.session.delete(result)
+            db.session.commit()
+            return "Delete True"
+        except Exception:
+            db.session.rollback()
+            return "Delete False", 500
+
+@genre_ns.route("/")
+class GenreViews(Resource):
+    def get(self):
+        genre_id = request.args.get('id')
+        query = Genre.query
+        if genre_id:
+            query = query.filter(Genre.id == genre_id)
+
+        return GenreSchema(many=True).dump(query.all()), 200
+
+    def post(self):
+        data = request.json
+        try:
+            db.session.add(
+                Genre(**data)
+            )
+            db.session.commit()
+            return "Load Try"
+        except Exception as e:
+            print(e)
+            db.session.rollback() #rollback - это отмена записи, лучше делать обвязку через тру
+            return "Load False", 500
+
+
+@genre_ns.route("/<int:id>")
+class GenreViews(Resource):
+    def get(self, id):
+        a = GenreSchema().dump(Genre.query.filter(Genre.id == id).first())
+        b = MovieSchema().dump(Movie.query.filter(Movie.genre).first())
+        #c = .genre_id == id
+        #all_movie = Movie.query
+        #b = MovieSchema(many=True).dump(all_movie.all())
+        #d = b[1]
+        #querys = b.filter(Movie.id)
+        z = a["name"]
+        #c = b[1]
+        return b, 200
+
+    def put(self, id):
+        data = request.json
+        try:
+            result = Genre.query.filter(Genre.id == id).one()
+            result = data.get()
+            db.session.add(result)
+            db.session.commit()
+            return "UpLoad True"
+        except Exception:
+            db.session.rollback()
+            return "UpLoad False", 500
+
+    def delete(self, id):
+        try:
+            result = Genre.query.filter(Genre.id == id).one()
+            db.session.delete(result)
+            db.session.commit()
+            return "Delete True"
+        except Exception:
+            db.session.rollback()
+            return "Delete False", 500
+
 
 
 if __name__ == '__main__':
