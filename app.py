@@ -49,7 +49,7 @@ class MoviesViews(Resource):
     def put(self, id):
         data = request.json
         try:
-            result = Movie.query.filter(Movie.id == id).one()
+            result = Movie.query.filter(Movie.id == id).update(data)
             result = data.get()
             db.session.add(result)
             db.session.commit()
@@ -101,7 +101,7 @@ class DirectorViews(Resource):
     def put(self, id):
         data = request.json
         try:
-            result = Director.query.filter(Director.id == id).one()
+            result = Director.query.filter(Director.id == id).update(data)
             result = data.get()
             db.session.add(result)
             db.session.commit()
@@ -148,20 +148,21 @@ class GenreViews(Resource):
 class GenreViews(Resource):
     def get(self, id):
         a = GenreSchema().dump(Genre.query.filter(Genre.id == id).first())
-        b = MovieSchema().dump(Movie.query.filter(Movie.genre).first())
-        #c = .genre_id == id
-        #all_movie = Movie.query
-        #b = MovieSchema(many=True).dump(all_movie.all())
-        #d = b[1]
-        #querys = b.filter(Movie.id)
-        z = a["name"]
-        #c = b[1]
-        return b, 200
+        id_genre = a['id']
+        query = Movie.query
+        c = MovieSchema(many=True).dump(query.all())
+        title_movie = []
+        for i in c:
+            a = i['genre']
+            for key, value in a.items():
+                if value == id_genre:
+                    title_movie.append(i['title'])
+        return f'{a}, {title_movie}', 200
 
     def put(self, id):
         data = request.json
         try:
-            result = Genre.query.filter(Genre.id == id).one()
+            result = Genre.query.filter(Genre.id == id).update(data)
             result = data.get()
             db.session.add(result)
             db.session.commit()

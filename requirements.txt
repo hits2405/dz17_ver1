@@ -18,3 +18,21 @@ SQLAlchemy==1.4.25
 typing-extensions==3.10.0.2
 Werkzeug==2.0.1
 zipp==3.6.0
+
+[
+  {
+    "director": {
+      "name": "Тейлор Шеридан",
+      "id": 1
+    },
+    "description": "Владелец ранчо пытается сохранить землю своих предков. Кевин Костнер в неовестерне от автора «Ветреной реки»",
+    "title": "Йеллоустоун",
+    "trailer": "https://www.youtube.com/watch?v=UKei_d0cbP4",
+    "id": 1,
+    "year": 2018,
+    "genre": {
+      "name": "Вестерн",
+      "id": 17
+    },
+    "rating": 8.6
+  },
