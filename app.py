@@ -49,9 +49,7 @@ class MoviesViews(Resource):
     def put(self, id):
         data = request.json
         try:
-            result = Movie.query.filter(Movie.id == id).update(data)
-            result = data.get()
-            db.session.add(result)
+            Movie.query.filter(Movie.id == id).update(data)
             db.session.commit()
             return "UpLoad True"
         except Exception:
@@ -101,9 +99,7 @@ class DirectorViews(Resource):
     def put(self, id):
         data = request.json
         try:
-            result = Director.query.filter(Director.id == id).update(data)
-            result = data.get()
-            db.session.add(result)
+            Director.query.filter(Director.id == id).update(data)
             db.session.commit()
             return "UpLoad True"
         except Exception:
@@ -148,23 +144,17 @@ class GenreViews(Resource):
 class GenreViews(Resource):
     def get(self, id):
         a = GenreSchema().dump(Genre.query.filter(Genre.id == id).first())
-        id_genre = a['id']
-        query = Movie.query
-        c = MovieSchema(many=True).dump(query.all())
-        title_movie = []
-        for i in c:
-            a = i['genre']
-            for key, value in a.items():
-                if value == id_genre:
-                    title_movie.append(i['title'])
-        return f'{a}, {title_movie}', 200
+        query = Movie.query.filter(Movie.genre_id == id)
+        movies = MovieSchema(many=True).dump(query.all())
+        genre = GenreSchema().dump(Genre.query.filter(Genre.id == id).first())
+        movies.insert(0, genre)
+        return movies
+
 
     def put(self, id):
         data = request.json
         try:
-            result = Genre.query.filter(Genre.id == id).update(data)
-            result = data.get()
-            db.session.add(result)
+            Genre.query.filter(Genre.id == id).update(data)
             db.session.commit()
             return "UpLoad True"
         except Exception:
